@@ -3,7 +3,7 @@ train_split: ['train']
 val_split: ['valid']
 dataset: {
   json_file: ./data/pt/action_localisation_valid.json,
-  feat_folder: ./data/pt/action_localisation_valid/video_features,
+  feat_folder: ./data/pt/action_localisation_valid_video_features,
   file_prefix: v_,
   file_ext: .npy,
   num_classes: 63,
