@@ -35,16 +35,22 @@ def load_gt_seg_from_json(json_file, split=None, label='label_id', label_offset=
     # load json file
     with open(json_file, "r", encoding="utf8") as f:
         json_db = json.load(f)
-    json_db = json_db['database']
 
     vids, starts, stops, labels = [], [], [], []
     for k, v in json_db.items():
 
         # filter based on split
-        if (split is not None) and v['subset'].lower() != split:
+        if (split is not None) and v['metadata']['split'].lower() != split:
             continue
+        
+        for act in v['action_localisation']:
+            act['label'] = act['label']
+            act['label_id'] = act['label_id']
+            act['segment'] = [x/1e6 for x in act['timestamps']]
+            del act['timestamps']
+
         # remove duplicated instances
-        ants = remove_duplicate_annotations(v['annotations'])
+        ants = remove_duplicate_annotations(v['action_localisation'])
         # video id
         vids += [k] * len(ants)
         # for each event, grab the start/end time and label
@@ -321,8 +327,8 @@ def compute_average_precision_detection(
             if fp[tidx, idx] == 0 and tp[tidx, idx] == 0:
                 fp[tidx, idx] = 1
 
-    tp_cumsum = np.cumsum(tp, axis=1).astype(np.float)
-    fp_cumsum = np.cumsum(fp, axis=1).astype(np.float)
+    tp_cumsum = np.cumsum(tp, axis=1).astype(float)
+    fp_cumsum = np.cumsum(fp, axis=1).astype(float)
     recall_cumsum = tp_cumsum / npos
 
     precision_cumsum = tp_cumsum / (tp_cumsum + fp_cumsum)
