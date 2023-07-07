@@ -1,4 +1,4 @@
-### We have forked this repo as part of our challenge evaluation, we demonstrate how to train and evaluate Actionformer on the Perception Test. All credit to the original authors for releasing this repo, link to the original here: [[happyharrycn/actionformer_release](https://github.com/happyharrycn/actionformer_release)](https://github.com/happyharrycn/actionformer_release). You can find the repo for The Perception Test here: [https://github.com/deepmind/perception_test](https://github.com/deepmind/perception_test).###
+### We have forked this repo as part of our challenge evaluation, we demonstrate how to train and evaluate Actionformer on the Perception Test. All credit to the original authors for releasing this repo, link to the original here: [happyharrycn/actionformer_release](https://github.com/happyharrycn/actionformer_release)(https://github.com/happyharrycn/actionformer_release). You can find the repo for The Perception Test here: [https://github.com/deepmind/perception_test](https://github.com/deepmind/perception_test).###
 
 # ActionFormer: Localizing Moments of Actions with Transformers
 
