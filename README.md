@@ -1,3 +1,5 @@
+### We have forked this repo as part of our challenge evaluation, we demonstrate how to train and evaluate Actionformer on the Perception Test. All credit to the original authors for releasing this. ###
+
 # ActionFormer: Localizing Moments of Actions with Transformers
 
 ## Introduction
