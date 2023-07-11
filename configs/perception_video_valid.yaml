@@ -49,7 +49,7 @@ train_cfg: {
 }
 test_cfg: {
   pre_nms_topk: 5000,
-  max_seg_num: 2000,
+  max_seg_num: 1000,
   min_score: 0.001,
   nms_sigma : 0.4,
   multiclass_nms: True,
