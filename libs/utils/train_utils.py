@@ -438,8 +438,7 @@ def valid_one_epoch(
                     results_dict[vid] = []
 
                 results_dict[vid].append({'label':str(results['label'][idx]),
-                     'timestamps':[float(results['t-start'][idx]), float(results['t-end'][idx])])
-                    })
+                     'timestamps':[float(results['t-start'][idx]), float(results['t-end'][idx])]})
             with open(output_file, 'w') as my_file:
                 json.dump(results_dict, my_file)
         else:
