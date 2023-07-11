@@ -86,7 +86,11 @@ def main(args):
             tiou_thresholds = val_db_vars['tiou_thresholds']
         )
     else:
-        output_file = os.path.join(os.path.split(ckpt_file)[0], 'eval_results.pkl')
+        if args.challenge:
+            file_suffix = '.json'
+        else:
+            file_suffix = '.pkl'
+        output_file = os.path.join(os.path.split(ckpt_file)[0], f'eval_results{file_suffix}')
 
     """5. Test the model"""
     print("\nStart testing model {:s} ...".format(cfg['model_name']))
@@ -99,7 +103,8 @@ def main(args):
         output_file=output_file,
         ext_score_file=cfg['test_cfg']['ext_score_file'],
         tb_writer=None,
-        print_freq=args.print_freq
+        print_freq=args.print_freq,
+        challenge=args.challenge
     )
     end = time.time()
     print("All done! Total time: {:0.2f} sec".format(end - start))
@@ -121,6 +126,8 @@ if __name__ == '__main__':
                         help='max number of output actions (default: -1)')
     parser.add_argument('--saveonly', action='store_true',
                         help='Only save the ouputs without evaluation (e.g., for test set)')
+    parser.add_argument('--challenge', action='store_true',
+                        help='save outputs in perception test TAL challenge format')
     parser.add_argument('-p', '--print-freq', default=10, type=int,
                         help='print frequency (default: 10 iterations)')
     args = parser.parse_args()
