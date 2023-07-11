@@ -366,7 +366,6 @@ def valid_one_epoch(
     output_file = None,
     tb_writer = None,
     print_freq = 20,
-    challenge=False
 ):
     """Test the model on the validation set"""
     # either evaluate the results or save the results
@@ -429,22 +428,17 @@ def valid_one_epoch(
         # call the evaluator
         _, mAP, _ = evaluator.evaluate(results, verbose=True)
     else:
-        if challenge:
-            results_dict = {}
-            for idx, vid in enumerate(results['video-id']):
-                try:
-                    results_dict[vid]
-                except KeyError:
-                    results_dict[vid] = []
+        results_dict = {}
+        for idx, vid in enumerate(results['video-id']):
+            try:
+                results_dict[vid]
+            except KeyError:
+                results_dict[vid] = []
 
-                results_dict[vid].append({'label':str(results['label'][idx]),
-                     'timestamps':[float(results['t-start'][idx]), float(results['t-end'][idx])]})
-            with open(output_file, 'w') as my_file:
-                json.dump(results_dict, my_file)
-        else:
-            # dump to a pickle file that can be directly used for evaluation
-            with open(output_file, "wb") as f:
-                pickle.dump(results, f)
+            results_dict[vid].append({'label':str(results['label'][idx]),
+                 'timestamps':[float(results['t-start'][idx]), float(results['t-end'][idx])]})
+        with open(output_file, 'w') as my_file:
+            json.dump(results_dict, my_file)
 
         mAP = 0.0
 
