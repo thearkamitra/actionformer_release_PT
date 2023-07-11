@@ -369,7 +369,7 @@ def valid_one_epoch(
 ):
     """Test the model on the validation set"""
     # either evaluate the results or save the results
-    assert (evaluator is not None) or (output_file is not None)
+    # assert (evaluator is not None) or (output_file is not None)
 
     # set up meters
     batch_time = AverageMeter()
@@ -422,25 +422,22 @@ def valid_one_epoch(
     results['label'] = torch.cat(results['label']).numpy()
     results['score'] = torch.cat(results['score']).numpy()
 
-    if evaluator is not None:
-        if ext_score_file is not None and isinstance(ext_score_file, str):
-            results = postprocess_results(results, ext_score_file)
-        # call the evaluator
-        _, mAP, _ = evaluator.evaluate(results, verbose=True)
-    else:
-        results_dict = {}
-        for idx, vid in enumerate(results['video-id']):
-            try:
-                results_dict[vid]
-            except KeyError:
-                results_dict[vid] = []
+    if ext_score_file is not None and isinstance(ext_score_file, str):
+        results = postprocess_results(results, ext_score_file)
+    # call the evaluator
+    _, mAP, _ = evaluator.evaluate(results, verbose=True)
 
-            results_dict[vid].append({'label':str(results['label'][idx]),
-                 'timestamps':[float(results['t-start'][idx]), float(results['t-end'][idx])]})
-        with open(output_file, 'w') as my_file:
-            json.dump(results_dict, my_file)
+    results_dict = {}
+    for idx, vid in enumerate(results['video-id']):
+        try:
+            results_dict[vid]
+        except KeyError:
+            results_dict[vid] = []
 
-        mAP = 0.0
+        results_dict[vid].append({'label':str(results['label'][idx]),
+             'timestamps':[float(results['t-start'][idx]), float(results['t-end'][idx])]})
+    with open(output_file, 'w') as my_file:
+        json.dump(results_dict, my_file)
 
     # log mAP to tb_writer
     if tb_writer is not None:
