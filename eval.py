@@ -80,6 +80,8 @@ def main(args):
     val_db_vars = val_dataset.get_attributes()
     det_eval = ANETdetection(
         val_dataset.json_file,
+        val_dataset.task,
+        val_dataset.label_dict,
         val_dataset.split[0],
         tiou_thresholds = val_db_vars['tiou_thresholds']
     )
