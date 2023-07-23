@@ -31,10 +31,17 @@ def remove_duplicate_annotations(ants, tol=1e-3):
     return valid_events
 
 
-def load_gt_seg_from_json(json_file, split=None, label='label_id', label_offset=0):
+def load_gt_seg_from_json(json_file, task, label_dict, split=None, label='label_id', label_offset=0):
     # load json file
     with open(json_file, "r", encoding="utf8") as f:
         json_db = json.load(f)
+    
+    for key, value in json_db.items():
+        tmp_acts = []
+        for act in value[task]:
+            if act['label'] in label_dict.keys():
+                tmp_acts.append(act)
+        value[task] = tmp_acts  
 
     vids, starts, stops, labels = [], [], [], []
     for k, v in json_db.items():
@@ -43,14 +50,14 @@ def load_gt_seg_from_json(json_file, split=None, label='label_id', label_offset=
         if (split is not None) and v['metadata']['split'].lower() != split:
             continue
         
-        for act in v['action_localisation']:
+        for act in v[task]:
             act['label'] = act['label']
             act['label_id'] = act['label_id']
             act['segment'] = [x/1e6 for x in act['timestamps']]
             del act['timestamps']
 
         # remove duplicated instances
-        ants = remove_duplicate_annotations(v['action_localisation'])
+        ants = v[task] #remove_duplicate_annotations(v[task])
         # video id
         vids += [k] * len(ants)
         # for each event, grab the start/end time and label
@@ -121,6 +128,8 @@ class ANETdetection(object):
     def __init__(
         self,
         ant_file,
+        task,
+        label_dict,
         split=None,
         tiou_thresholds=np.linspace(0.1, 0.5, 5),
         top_k=(1, 5),
@@ -142,11 +151,12 @@ class ANETdetection(object):
         # Import ground truth and predictions
         self.split = split
         self.ground_truth = load_gt_seg_from_json(
-            ant_file, split=self.split, label=label, label_offset=label_offset)
+            ant_file, task, label_dict, split=self.split, label=label, label_offset=label_offset)
 
         # remove labels that does not exists in gt
         self.activity_index = {j: i for i, j in enumerate(sorted(self.ground_truth['label'].unique()))}
         self.ground_truth['label']=self.ground_truth['label'].replace(self.activity_index)
+        
 
     def _get_predictions_with_label(self, prediction_by_label, label_name, cidx):
         """Get all predicitons of the given label. Return empty DataFrame if there
