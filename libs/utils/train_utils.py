@@ -361,6 +361,7 @@ def valid_one_epoch(
     val_loader,
     model,
     curr_epoch,
+    task,
     ext_score_file = None,
     evaluator = None,
     output_file = None,
@@ -432,9 +433,10 @@ def valid_one_epoch(
         try:
             results_dict[vid]
         except KeyError:
-            results_dict[vid] = []
+            results_dict[vid] = {task: []}
 
-        results_dict[vid].append({'label':str(results['label'][idx]),
+        results_dict[vid][task].append({'label':str(results['label'][idx]),
+             'score':str(results['score'][idx]),
              'timestamps':[float(results['t-start'][idx]), float(results['t-end'][idx])]})
     with open(output_file, 'w') as my_file:
         json.dump(results_dict, my_file)
