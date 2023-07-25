@@ -95,6 +95,7 @@ def main(args):
         val_loader,
         model,
         -1,
+        val_dataset.task,
         evaluator=det_eval,
         output_file=output_file,
         ext_score_file=cfg['test_cfg']['ext_score_file'],
