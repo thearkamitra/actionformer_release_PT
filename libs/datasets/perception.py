@@ -35,9 +35,7 @@ class ActivityNetDataset(Dataset):
         force_upsampling, # force to upsample to max_seq_len
         input_modality,   # input modality ['video', 'audio', 'multi']
         mm_feat_folder,    # if using multiple input modalities specify other 
-                          #   modality features
-        task,   
-        label_dict                              
+        task                  #   modality features
     ):
         # file path
         assert os.path.exists(feat_folder) and os.path.exists(json_file)
@@ -80,19 +78,15 @@ class ActivityNetDataset(Dataset):
         self.max_seq_len = max_seq_len
         self.trunc_thresh = trunc_thresh
         self.num_classes = num_classes
-        self.label_dict = label_dict
+        self.label_dict = None
         self.crop_ratio = crop_ratio
-        
-        if self.label_dict is not None:
-            with open(self.label_dict, 'r') as fid:
-                self.label_dict = json.load(fid)
 
         # load database and select the subset
         dict_db, label_dict = self._load_json_db(self.json_file)
         # proposal vs action categories
-        self.data_list = dict_db #[0:5]
+      
+        self.data_list = dict_db #[0:100]
         self.label_dict = label_dict
-
 
         # dataset specific attributes
         self.db_attributes = {
@@ -109,7 +103,7 @@ class ActivityNetDataset(Dataset):
         # load database and select the subset
         with open(json_file, 'r') as fid:
             json_db = json.load(fid)
-        
+
         # if label_dict is not available
         if self.label_dict is None:
             label_dict = {}
@@ -120,18 +114,6 @@ class ActivityNetDataset(Dataset):
                     act['segment'] = [x/1e6 for x in act['timestamps']]
                     del act['timestamps']
                     label_dict[act['label']] = act['label_id']
-        else:
-            label_dict = self.label_dict
-            for key, value in json_db.items():
-                tmp_acts = []
-                for act in value[self.task]:
-                    if act['label'] in label_dict.keys():
-                        act['label'] = act['label']
-                        act['label_id'] = act['label_id']
-                        act['segment'] = [x/1e6 for x in act['timestamps']]
-                        del act['timestamps']
-                        tmp_acts.append(act)
-                value[self.task] = tmp_acts  
 
         # fill in the db (immutable afterwards)
         dict_db = tuple()
@@ -166,29 +148,12 @@ class ActivityNetDataset(Dataset):
             else:
                 segments = None
                 labels = None
-                continue
-                
-            if self.input_modality in ['video', 'audio']:
-                filename = os.path.join(self.feat_folder + '/' + key + self.file_ext)
-                if os.path.exists(filename):
-                    dict_db += ({'id': key,
-                   'fps' : fps,
-                   'duration' : duration,
-                   'segments' : segments,
-                   'labels' : labels
-                    }, )
-                
-            if self.input_modality == 'multi':
-                mm_filename = os.path.join(self.mm_feat_folder + '/' + key + self.file_ext)
-                filename = os.path.join(self.feat_folder + '/' + key + self.file_ext)
-                if os.path.exists(mm_filename) and os.path.exists(filename):
-                    dict_db += ({'id': key,
-                   'fps' : fps,
-                   'duration' : duration,
-                   'segments' : segments,
-                   'labels' : labels
-                    }, )
-
+            dict_db += ({'id': key,
+                          'fps' : fps,
+                          'duration' : duration,
+                          'segments' : segments,
+                          'labels' : labels
+            }, )
 
         return dict_db, label_dict
 
@@ -204,7 +169,7 @@ class ActivityNetDataset(Dataset):
         filename = os.path.join(self.feat_folder + '/'
                                     + video_item['id'] + self.file_ext)
         feats = np.load(filename).astype(np.float32)
-        
+
         if self.input_modality == 'multi': 
             mm_filename = os.path.join(self.mm_feat_folder + '/'
                                     + video_item['id'] + self.file_ext)
