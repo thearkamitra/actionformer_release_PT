@@ -2,10 +2,10 @@ dataset_name: ego4d
 train_split: ['training']
 val_split: ['validation']
 dataset: {
-  json_file: ./data/ego4d/annotations/ego4d.json,
+  json_file: ../dataego4d/annotations/ego4d.json,
   feat_folder: [
-    './data/ego4d/omnivore_features', 
-    './data/ego4d/egovlp_features'
+    '../dataego4d/omnivore_features', 
+    '../dataego4d/egovlp_features'
   ],
   file_prefix: ~,
   file_ext: .npy,
@@ -64,4 +64,4 @@ test_cfg: {
   multiclass_nms: True,
   voting_thresh: 0.95,
 }
-output_folder: ./ckpt/
+output_folder: ../ckpt/
